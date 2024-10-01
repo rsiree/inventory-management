@@ -1,3 +1,20 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+:root{
+  --sm:14px;
+  --base:16px;
+  --lg:18px;
+  --xl:20px;
+  --xxl:32px;
+
+  --primary:#ffffff;
+  --background:#000000;
+  --foreground:#fefefe;
+  --header-title:#2b9b0c;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,7 +22,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
- background-color: #000;
 }
 
 code {
