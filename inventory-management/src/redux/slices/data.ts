@@ -7,7 +7,8 @@ interface intialStateProps {
     isLoading: Boolean,
     categoryData: any,
     outOfStock: number,
-    totalStoreValue: 0
+    totalStoreValue: number,
+    totalProducts: number
 }
 
 const initialState: intialStateProps = {
@@ -15,7 +16,8 @@ const initialState: intialStateProps = {
     isLoading: false,
     categoryData: null,
     outOfStock: 0,
-    totalStoreValue: 0
+    totalStoreValue: 0,
+    totalProducts: 0
 }
 
 // const url = process.env.BASE_URL || 'https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory';
@@ -67,12 +69,24 @@ export const dataSlice = createSlice({
                 if (key === category) {
                     value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
                 }
-            }
+            };
+            state.totalProducts -= 1;
         },
         disableProduct: (state: any, action: PayloadAction<any>) => {
-            let { index, isDisabled } = action?.payload
+            let { index, isDisabled, item } = action?.payload;
+            let { category, quantity, value } = item;
             let data = [...state.data];
             state.data = data?.map((item: any, ind: number) => ind === index ? { ...item, 'isDisabled': isDisabled } : item);
+            state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
+            state.totalStoreValue -= value?.split("$")?.[1] || value;
+            for (let key in state.categoryData) {
+                let value = state.categoryData[category]
+                if (key === category) {
+                    value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
+                }
+            }
+            state.totalProducts -= 1;
+
         }
     },
     extraReducers: (builder) => {
@@ -86,7 +100,8 @@ export const dataSlice = createSlice({
                 state.data = data;
                 state.categoryData = categories;
                 state.outOfStock = out_of_stock;
-                state.totalStoreValue = total_store_value
+                state.totalStoreValue = total_store_value;
+                state.totalProducts = data?.length
             })
             .addCase(fetchData.rejected, (state: any, action: any) => {
                 state.isLoading = false

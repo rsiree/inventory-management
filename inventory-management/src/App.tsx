@@ -11,7 +11,7 @@ import { deleteProduct, disableProduct, fetchData } from './redux/slices/data';
 function App() {
 
   const dispatch = useDispatch<any>();
-  const { data, isLoading, categoryData, outOfStock, totalStoreValue } = useSelector((state: any) => state.dataReducer);
+  const { data, isLoading, categoryData, outOfStock, totalStoreValue, totalProducts } = useSelector((state: any) => state.dataReducer);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const handleDeleteProduct = ({ index, item }: any) => {
@@ -23,8 +23,8 @@ function App() {
     console.log("hi")
   }
 
-  const handleDisableProduct = ({ index, isDisabled }: any) => {
-    dispatch(disableProduct({ index, isDisabled }))
+  const handleDisableProduct = ({ index, isDisabled, item }: any) => {
+    dispatch(disableProduct({ index, isDisabled, item }))
   }
 
   console.log(data, categoryData, outOfStock, totalStoreValue)
@@ -62,7 +62,7 @@ function App() {
             <FaShoppingCart className='w-8 h-8' />
             <div className='flex flex-col items-start'>
               <p className='text-sm'>Total Product</p>
-              <p className='text-2xl font-medium'>{data?.length}</p>
+              <p className='text-2xl font-medium'>{totalProducts ?? 0}</p>
             </div>
           </div>
           <div className='bg-inventory-card-background p-3 rounded-md flex gap-4 align-top min-h-24'>
@@ -115,9 +115,9 @@ function App() {
                flex gap-1">
                   <MdEdit className={isAdmin ? 'text-green-800' : 'text-border'} onClick={handleEditProduct} />
                   {item?.isDisabled ?
-                    <IoEyeOffSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false }) : ''} />
+                    <IoEyeOffSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false, item }) : ''} />
                     :
-                    <IoEyeSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: true }) : ''} />
+                    <IoEyeSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: true, item }) : ''} />
                   }
                   <MdDelete className={isAdmin ? 'text-red-600' : 'text-border'} onClick={() => isAdmin ? handleDeleteProduct({ item, index }) : ''} />
                 </td>
