@@ -59,34 +59,42 @@ export const dataSlice = createSlice({
     initialState,
     reducers: {
         deleteProduct: (state: any, action: PayloadAction<any>) => {
-            let { category, quantity, value } = action?.payload?.item;
+            let { category, quantity, value, isDisabled } = action?.payload?.item;
             let data = [...state.data];
             state.data = data?.filter((_: any, index: number) => index !== action?.payload?.index);
-            state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
-            state.totalStoreValue -= value?.split("$")?.[1] || value;
+            state.outOfStock = quantity === 0 ? isDisabled ? state.outOfStock : state.outOfStock - 1 : state.outOfStock;
+
             for (let key in state.categoryData) {
                 let value = state.categoryData[category]
                 if (key === category) {
                     value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
                 }
             };
-            state.totalProducts -= 1;
+            state.totalProducts = isDisabled ? state.totalProducts : state.totalProducts - 1;
+            state.totalStoreValue = isDisabled ? state.totalStoreValue : state.totalStoreValue - (value?.split("$")?.[1] || value);
         },
         disableProduct: (state: any, action: PayloadAction<any>) => {
             let { index, isDisabled, item } = action?.payload;
             let { category, quantity, value } = item;
             let data = [...state.data];
             state.data = data?.map((item: any, ind: number) => ind === index ? { ...item, 'isDisabled': isDisabled } : item);
-            state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
-            state.totalStoreValue -= value?.split("$")?.[1] || value;
+            // state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
+            state.totalStoreValue = isDisabled ? state.totalStoreValue - (value?.split("$")?.[1] || value) : state.totalStoreValue + (value?.split("$")?.[1] || value);
             for (let key in state.categoryData) {
                 let value = state.categoryData[category]
                 if (key === category) {
-                    value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
+                    isDisabled ?
+                        value > 1 ?
+                            state.categoryData[category]--
+                            : state.categoryData[category] = 0
+                        :
+                        value > 1 ?
+                            state.categoryData[category]++
+                            : state.categoryData[category] = 1;
                 }
             }
-            state.totalProducts -= 1;
-
+            state.outOfStock = quantity === 0 ? isDisabled ? state.outOfStock - 1 : state.outOfStock + 1 : state.outOfStock;
+            state.totalProducts = isDisabled ? state.totalProducts - 1 : state.totalProducts + 1
         }
     },
     extraReducers: (builder) => {

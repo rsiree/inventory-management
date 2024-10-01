@@ -12,8 +12,9 @@ function App() {
 
   const dispatch = useDispatch<any>();
   const { data, isLoading, categoryData, outOfStock, totalStoreValue, totalProducts } = useSelector((state: any) => state.dataReducer);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
 
+  console.log(categoryData)
   const handleDeleteProduct = ({ index, item }: any) => {
     console.log(item, 'delete click')
     dispatch(deleteProduct({ item, index }))
@@ -113,13 +114,13 @@ function App() {
                 <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
-                  <MdEdit className={isAdmin ? 'text-green-800' : 'text-border'} onClick={handleEditProduct} />
+                  <MdEdit className={isAdmin ? 'text-green-800 cursor-pointer' : 'text-border cursor-not-allowed'} onClick={handleEditProduct} />
                   {item?.isDisabled ?
-                    <IoEyeOffSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false, item }) : ''} />
+                    <IoEyeOffSharp className={isAdmin ? 'text-purple-500 cursor-pointer' : 'text-border  cursor-not-allowed'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false, item }) : ''} />
                     :
-                    <IoEyeSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: true, item }) : ''} />
+                    <IoEyeSharp className={isAdmin ? 'text-purple-500 cursor-pointer' : 'text-border  cursor-not-allowed'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: true, item }) : ''} />
                   }
-                  <MdDelete className={isAdmin ? 'text-red-600' : 'text-border'} onClick={() => isAdmin ? handleDeleteProduct({ item, index }) : ''} />
+                  <MdDelete className={isAdmin ? 'text-red-600 cursor-pointer' : 'text-border  cursor-not-allowed'} onClick={() => isAdmin ? handleDeleteProduct({ item, index }) : ''} />
                 </td>
               </tr>
             ))}
