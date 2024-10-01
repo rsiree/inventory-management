@@ -13,6 +13,7 @@
   --background:#000000;
   --foreground:#fefefe;
   --header-title:#2b9b0c;
+  --border:#d8d7d7;
 }
 
 body {
@@ -22,6 +23,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  color:var(--primary)
 }
 
 code {
