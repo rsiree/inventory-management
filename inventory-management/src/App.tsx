@@ -113,13 +113,13 @@ function App() {
                 <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
-                  <MdEdit className='text-green-800' onClick={handleEditProduct} />
+                  <MdEdit className={isAdmin ? 'text-green-800' : 'text-border'} onClick={handleEditProduct} />
                   {item?.isDisabled ?
-                    <IoEyeOffSharp className='text-purple-500' onClick={() => handleDisableProduct({ index, isDisabled: false })} />
+                    <IoEyeOffSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false }) : ''} />
                     :
-                    <IoEyeSharp className='text-purple-500' onClick={() => handleDisableProduct({ index, isDisabled: true })} />
+                    <IoEyeSharp className={isAdmin ? 'text-purple-500' : 'text-border'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: true }) : ''} />
                   }
-                  <MdDelete className='text-red-600' onClick={() => handleDeleteProduct({ item, index })} />
+                  <MdDelete className={isAdmin ? 'text-red-600' : 'text-border'} onClick={() => isAdmin ? handleDeleteProduct({ item, index }) : ''} />
                 </td>
               </tr>
             ))}
