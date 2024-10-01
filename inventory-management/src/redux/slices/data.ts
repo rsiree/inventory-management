@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface intialStateProps {
@@ -55,7 +55,19 @@ export const dataSlice = createSlice({
     name: 'dataSlice',
     initialState,
     reducers: {
-
+        deleteProduct: (state: any, action: PayloadAction<any>) => {
+            let { category, quantity, value } = action?.payload?.item;
+            let data = [...state.data];
+            state.data = data?.filter((_: any, index: number) => index !== action?.payload?.index);
+            state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
+            state.totalStoreValue -= value?.split("$")?.[1] || value;
+            for (let key in state.categoryData) {
+                let value = state.categoryData[category]
+                if (key === category) {
+                    value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
+                }
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -75,5 +87,9 @@ export const dataSlice = createSlice({
             })
     }
 })
+
+export const {
+    deleteProduct
+} = dataSlice.actions
 
 export default dataSlice.reducer

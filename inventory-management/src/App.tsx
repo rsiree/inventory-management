@@ -6,7 +6,7 @@ import { RiExchangeDollarLine } from "react-icons/ri";
 import { MdRemoveShoppingCart, MdCategory, MdDelete, MdEdit } from "react-icons/md";
 import { IoEyeSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from './redux/slices/data';
+import { deleteProduct, fetchData } from './redux/slices/data';
 
 function App() {
 
@@ -14,7 +14,11 @@ function App() {
   const { data, isLoading, categoryData, outOfStock, totalStoreValue } = useSelector((state: any) => state.dataReducer);
   const [isAdmin, setIsAdmin] = useState(false);
 
-
+  const handleDeleteProduct = ({ index, item }: any) => {
+    console.log(item, 'delete click')
+    dispatch(deleteProduct({ item, index }))
+  }
+  console.log(data, categoryData, outOfStock, totalStoreValue)
   useEffect(() => {
     dispatch(fetchData())
   }, []);
@@ -70,7 +74,7 @@ function App() {
             <MdCategory className='w-8 h-8' />
             <div className='flex flex-col items-start'>
               <p className='text-sm'>No of Category</p>
-              <p className='text-2xl font-medium'>{categoryData ? Object.keys(categoryData)?.length : 0}</p>
+              <p className='text-2xl font-medium'>{categoryData ? Object.values(categoryData)?.filter((x: any) => x !== 0)?.length : 0}</p>
             </div>
           </div>
         </div>
@@ -88,22 +92,24 @@ function App() {
             <th className='text-table-title text-sm p-4 font-normal '><div className='w-fit h-fit bg-background rounded-lg p-2 py-1'>Actions</div></th>
           </tr>
         </thead>
-        <tbody className='w-full pb-2 border-b-slate-200 border-b-[1px]'>
-          {data?.map((item: any, index: number) => (
-            <tr className='mt-2' key={index}>
-              <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.name}</td>
-              <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.category}</td>
-              <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.price}</td>
-              <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.quantity}</td>
-              <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
-              <td className="text-base px-4 py-5 border-border border-t-[1px]
+        <tbody className='w-full pb-2'>
+          {data?.length === 0 ?
+            <div className='w-full text-center text-xl p-4'>No Product Found</div>
+            : data?.map((item: any, index: number) => (
+              <tr className='mt-2' key={index}>
+                <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.name}</td>
+                <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.category}</td>
+                <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.price}</td>
+                <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.quantity}</td>
+                <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
+                <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
-                <MdEdit className='text-green-800' />
-                <IoEyeSharp className='text-purple-500' />
-                <MdDelete className='text-red-600' />
-              </td>
-            </tr>
-          ))}
+                  <MdEdit className='text-green-800' />
+                  <IoEyeSharp className='text-purple-500' />
+                  <MdDelete className='text-red-600' onClick={() => handleDeleteProduct({ item, index })} />
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
 
