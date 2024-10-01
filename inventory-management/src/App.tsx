@@ -7,6 +7,7 @@ import { MdRemoveShoppingCart, MdCategory, MdDelete, MdEdit } from "react-icons/
 import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteProduct, disableProduct, fetchData } from './redux/slices/data';
+import { isDisabled } from '@testing-library/user-event/dist/utils';
 
 function App() {
 
@@ -114,7 +115,11 @@ function App() {
                 <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
-                  <MdEdit className={isAdmin ? 'text-green-800 cursor-pointer' : 'text-border cursor-not-allowed'} onClick={handleEditProduct} />
+                  {isAdmin ?
+                    <MdEdit className={item?.isDisabled ? 'text-border cursor-not-allowed' : 'text-green-800 cursor-pointer'} onClick={handleEditProduct} />
+                    :
+                    <MdEdit className='text-border cursor-not-allowed' />
+                  }
                   {item?.isDisabled ?
                     <IoEyeOffSharp className={isAdmin ? 'text-purple-500 cursor-pointer' : 'text-border  cursor-not-allowed'} onClick={() => isAdmin ? handleDisableProduct({ index, isDisabled: false, item }) : ''} />
                     :

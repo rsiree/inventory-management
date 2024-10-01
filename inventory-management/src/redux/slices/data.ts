@@ -71,7 +71,7 @@ export const dataSlice = createSlice({
                 }
             };
             state.totalProducts = isDisabled ? state.totalProducts : state.totalProducts - 1;
-            state.totalStoreValue = isDisabled ? state.totalStoreValue : state.totalStoreValue - (value?.split("$")?.[1] || value);
+            state.totalStoreValue = isDisabled ? state.totalStoreValue : state.totalStoreValue - Number(value?.split("$")?.[1] || value);
         },
         disableProduct: (state: any, action: PayloadAction<any>) => {
             let { index, isDisabled, item } = action?.payload;
@@ -79,7 +79,8 @@ export const dataSlice = createSlice({
             let data = [...state.data];
             state.data = data?.map((item: any, ind: number) => ind === index ? { ...item, 'isDisabled': isDisabled } : item);
             // state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
-            state.totalStoreValue = isDisabled ? state.totalStoreValue - (value?.split("$")?.[1] || value) : state.totalStoreValue + (value?.split("$")?.[1] || value);
+            let storeValue = value?.split("$")?.[1] || value;
+            state.totalStoreValue = isDisabled ? state.totalStoreValue - Number(storeValue) : state.totalStoreValue + Number(storeValue);
             for (let key in state.categoryData) {
                 let value = state.categoryData[category]
                 if (key === category) {
