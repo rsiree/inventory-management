@@ -12,15 +12,20 @@ module.exports = {
     container: {
       width: '100%',
       padding: '1.5rem',
-      margin: 'auto'
+      margin: 'auto',
+      maxWidth: '1440px'
     },
     extend: {
       colors: {
         DEFAULT: 'var(--foreground)',
         'background': 'var(--background)',
         'primary': 'var(--primary)',
-        'title': 'var(--header-title)',
-        'border': 'var(--border)'
+        'border': 'var(--border)',
+        'inventory-card-background': 'var(--inventory-cards-background)',
+        table: {
+          background: 'var(--table-background)',
+          'title': 'var(--header-title)',
+        }
       }
     },
   },
