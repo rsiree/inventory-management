@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 import axios from "axios";
 
 interface intialStateProps {
@@ -67,6 +68,11 @@ export const dataSlice = createSlice({
                     value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
                 }
             }
+        },
+        disableProduct: (state: any, action: PayloadAction<any>) => {
+            let { index, isDisabled } = action?.payload
+            let data = [...state.data];
+            state.data = data?.map((item: any, ind: number) => ind === index ? { ...item, 'isDisabled': isDisabled } : item);
         }
     },
     extraReducers: (builder) => {
@@ -89,7 +95,8 @@ export const dataSlice = createSlice({
 })
 
 export const {
-    deleteProduct
+    deleteProduct,
+    disableProduct
 } = dataSlice.actions
 
 export default dataSlice.reducer

@@ -4,9 +4,9 @@ import { TbLogout } from "react-icons/tb";
 import { FaShoppingCart } from "react-icons/fa";
 import { RiExchangeDollarLine } from "react-icons/ri";
 import { MdRemoveShoppingCart, MdCategory, MdDelete, MdEdit } from "react-icons/md";
-import { IoEyeSharp } from "react-icons/io5";
+import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProduct, fetchData } from './redux/slices/data';
+import { deleteProduct, disableProduct, fetchData } from './redux/slices/data';
 
 function App() {
 
@@ -18,6 +18,15 @@ function App() {
     console.log(item, 'delete click')
     dispatch(deleteProduct({ item, index }))
   }
+
+  const handleEditProduct = () => {
+    console.log("hi")
+  }
+
+  const handleDisableProduct = ({ index, isDisabled }: any) => {
+    dispatch(disableProduct({ index, isDisabled }))
+  }
+
   console.log(data, categoryData, outOfStock, totalStoreValue)
   useEffect(() => {
     dispatch(fetchData())
@@ -104,8 +113,12 @@ function App() {
                 <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.value}</td>
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
-                  <MdEdit className='text-green-800' />
-                  <IoEyeSharp className='text-purple-500' />
+                  <MdEdit className='text-green-800' onClick={handleEditProduct} />
+                  {item?.isDisabled ?
+                    <IoEyeOffSharp className='text-purple-500' onClick={() => handleDisableProduct({ index, isDisabled: false })} />
+                    :
+                    <IoEyeSharp className='text-purple-500' onClick={() => handleDisableProduct({ index, isDisabled: true })} />
+                  }
                   <MdDelete className='text-red-600' onClick={() => handleDeleteProduct({ item, index })} />
                 </td>
               </tr>
