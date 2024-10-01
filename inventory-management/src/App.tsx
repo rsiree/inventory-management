@@ -5,39 +5,46 @@ import { FaShoppingCart } from "react-icons/fa";
 import { RiExchangeDollarLine } from "react-icons/ri";
 import { MdRemoveShoppingCart, MdCategory, MdDelete, MdEdit } from "react-icons/md";
 import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
+import { RxCross2 } from "react-icons/rx";
+
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProduct, disableProduct, fetchData } from './redux/slices/data';
-import { isDisabled } from '@testing-library/user-event/dist/utils';
+import { deleteProduct, disableProduct, fetchData, updateProduct } from './redux/slices/data';
 
 function App() {
 
   const dispatch = useDispatch<any>();
   const { data, isLoading, categoryData, outOfStock, totalStoreValue, totalProducts } = useSelector((state: any) => state.dataReducer);
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState<Boolean>(true);
+  const [editProductData, setEditProductData] = useState<any>(null);
 
-  console.log(categoryData)
+
   const handleDeleteProduct = ({ index, item }: any) => {
-    console.log(item, 'delete click')
     dispatch(deleteProduct({ item, index }))
   }
 
-  const handleEditProduct = () => {
-    console.log("hi")
+  const handleEditProduct = ({ item, index }: any) => {
+    setEditProductData({ item, index })
   }
 
   const handleDisableProduct = ({ index, isDisabled, item }: any) => {
     dispatch(disableProduct({ index, isDisabled, item }))
   }
 
-  console.log(data, categoryData, outOfStock, totalStoreValue)
+  const handleSaveUpdatedProduct = () => {
+    dispatch(updateProduct(editProductData));
+    setEditProductData({})
+  }
+
+  // console.log(data, categoryData, outOfStock, totalStoreValue)
   useEffect(() => {
     dispatch(fetchData())
   }, []);
 
+  // console.log(editProductData)
   if (isLoading) return <div className='text-2xl m-auto text-center'>Loading ...</div>
 
   return (
-    <div className="max-w-7xl py-3 px-4">
+    <div className={"max-w-7xl py-3 px-4 m-auto relative"}>
 
       {/* navigation */}
       <div className='flex justify-end gap-10 items-center'>
@@ -116,7 +123,7 @@ function App() {
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
                   {isAdmin ?
-                    <MdEdit className={item?.isDisabled ? 'text-border cursor-not-allowed' : 'text-green-800 cursor-pointer'} onClick={handleEditProduct} />
+                    <MdEdit className={item?.isDisabled ? 'text-border cursor-not-allowed' : 'text-green-800 cursor-pointer'} onClick={() => handleEditProduct({ item, index })} />
                     :
                     <MdEdit className='text-border cursor-not-allowed' />
                   }
@@ -131,7 +138,78 @@ function App() {
             ))}
         </tbody>
       </table>
-
+      {editProductData?.item &&
+        <div className='relative w-full h-full bg-red'>
+          <div className='fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-5/12 h-1/2 rounded-xl p-6 bg-table-popup-background m-auto'>
+            <div className='flex justify-between w-full gap-4 align-top'>
+              <h2 className='text-2xl'>Edit Product</h2>
+              <div className='flex justify-center items-center shadow-md rounded-sm w-9 h-9 cursor-pointer border-gray-400/10 border-[1px]' onClick={() => setEditProductData(null)}>
+                <RxCross2 className='text-table-title text-xl' />
+              </div>
+            </div>
+            <p className='text-base '>{editProductData?.item?.name}</p>
+            <div className='grid grid-cols-2 gap-6 w-full mt-6'>
+              <div className="flex flex-col gap-2 justify-start">
+                <p className="text-xs">Category</p>
+                <input type='text'
+                  className='bg-[#46504f]  rounded-xl py-1 px-4'
+                  value={editProductData?.item?.category}
+                  onChange={(e: any) =>
+                    setEditProductData({
+                      item: { ...editProductData?.item, 'category': e.target.value },
+                      index: editProductData?.index
+                    })
+                  } />
+              </div>
+              <div className="flex flex-col gap-2 justify-start">
+                <p className="text-xs">Price</p>
+                <input type='text'
+                  className='bg-[#46504f]  rounded-xl py-1 px-4'
+                  value={editProductData?.item?.price}
+                  onChange={(e: any) =>
+                    setEditProductData({
+                      item: { ...editProductData?.item, 'price': e.target.value },
+                      index: editProductData?.index
+                    })
+                  } />
+              </div>
+              <div className="flex flex-col gap-2 justify-start">
+                <p className="text-xs">Quantity</p>
+                <input type='text'
+                  className='bg-[#46504f]  rounded-xl py-1 px-4'
+                  value={editProductData?.item?.quantity}
+                  onChange={(e: any) =>
+                    setEditProductData({
+                      item: { ...editProductData?.item, 'quantity': e.target.value },
+                      index: editProductData?.index
+                    })
+                  } />
+              </div>
+              <div className="flex flex-col gap-2 justify-start">
+                <p className="text-xs">Value</p>
+                <input type='text'
+                  className='bg-[#46504f]  rounded-xl py-1 px-4'
+                  value={editProductData?.item?.value}
+                  onChange={(e: any) =>
+                    setEditProductData({
+                      item: { ...editProductData?.item, 'value': e.target.value },
+                      index: editProductData?.index
+                    })
+                  } />
+              </div>
+            </div>
+            <div className='flex gap-4 justify-end mt-6'>
+              <button className='text-sm text-table-title cursor-pointer'
+                onClick={() => {
+                  setEditProductData({})
+                }}>Cancel</button>
+              <button className='py-1 px-3 rounded-lg bg-[#46504f] text-sm cursor-pointer text-[#7fa9a4]'
+                onClick={handleSaveUpdatedProduct}
+              >Save</button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   );
 }

@@ -66,7 +66,7 @@ export const dataSlice = createSlice({
 
             for (let key in state.categoryData) {
                 let value = state.categoryData[category]
-                if (key === category) {
+                if (key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) {
                     value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
                 }
             };
@@ -83,19 +83,57 @@ export const dataSlice = createSlice({
             state.totalStoreValue = isDisabled ? state.totalStoreValue - Number(storeValue) : state.totalStoreValue + Number(storeValue);
             for (let key in state.categoryData) {
                 let value = state.categoryData[category]
-                if (key === category) {
+                if (key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) {
                     isDisabled ?
                         value > 1 ?
                             state.categoryData[category]--
                             : state.categoryData[category] = 0
                         :
-                        value > 1 ?
+                        value > 0 ?
                             state.categoryData[category]++
                             : state.categoryData[category] = 1;
                 }
             }
             state.outOfStock = quantity === 0 ? isDisabled ? state.outOfStock - 1 : state.outOfStock + 1 : state.outOfStock;
             state.totalProducts = isDisabled ? state.totalProducts - 1 : state.totalProducts + 1
+        },
+        updateProduct: (state: any, action: PayloadAction<any>) => {
+            const { item, index } = action?.payload;
+            const { category, value, quantity } = item;
+            let data = [...state.data];
+            let existingData = state.data?.find((_: any, ind: number) => ind === index);
+            let existingCategory = existingData?.category
+            state.data = data?.map((product: any, ind: number) => ind === index ? item : product);
+
+            let flag = false;
+            for (let key in state.categoryData) {
+                if ((key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) && (existingCategory?.toLowerCase() === category?.toLowerCase())) {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (flag) {
+                state.categoryData = { ...state.categoryData, [category]: state.categoryData[category] === 0 ? 1 : state.categoryData[category] }
+            }
+            else {
+                state.categoryData = {
+                    ...state.categoryData,
+                    [existingCategory]: state.categoryData[existingCategory] === 0 ? 0 : state.categoryData[existingCategory] - 1,
+                    [category]: 1
+                }
+            }
+
+            state.outOfStock = existingData?.quantity > 0 ?
+                quantity > 0 ?
+                    state.outOfStock
+                    : state.outOfStock + 1
+                : quantity > 0 ?
+                    state.outOfStock - 1
+                    : state.outOfStock
+                ;
+
+            state.totalStoreValue = state.totalStoreValue - Number(existingData?.value?.split("$")?.[1] || existingData?.value) + Number(value?.split("$")?.[1] || value)
         }
     },
     extraReducers: (builder) => {
@@ -120,7 +158,8 @@ export const dataSlice = createSlice({
 
 export const {
     deleteProduct,
-    disableProduct
+    disableProduct,
+    updateProduct
 } = dataSlice.actions
 
 export default dataSlice.reducer

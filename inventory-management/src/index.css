@@ -3,6 +3,7 @@
 @tailwind components;
 
 :root{
+  --xs:12px;
   --sm:14px;
   --base:16px;
   --lg:18px;
@@ -14,10 +15,15 @@
   --foreground:#fefefe;
   --border:#c3c1c1;
   
-  --table-background:#2b2b2c;
+  --table-background:#111111;
   --inventory-cards-background:rgb(54, 90, 54);
   --header-title:#a6b530;
+  --popup-background:#2f3735
 
+}
+
+.input-box{
+  background-color: transparent;
 }
 
 body {
