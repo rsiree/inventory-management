@@ -8,7 +8,8 @@ import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProduct, disableProduct, fetchData, getInventoryStocks, updateProduct } from './redux/slices/data';
+import { deleteProduct, disableProduct, fetchData, getInventoryStats, updateProduct } from './redux/slices/data';
+import { EditPopup } from './components/EditPopup';
 
 function App() {
 
@@ -20,7 +21,7 @@ function App() {
 
   const handleDeleteProduct = ({ index, item }: any) => {
     dispatch(deleteProduct({ item, index }));
-    dispatch(getInventoryStocks())
+    dispatch(getInventoryStats())
   }
 
   const handleEditProduct = ({ item, index }: any) => {
@@ -29,12 +30,19 @@ function App() {
 
   const handleDisableProduct = ({ index, isDisabled, item }: any) => {
     dispatch(disableProduct({ index, isDisabled, item }));
-    dispatch(getInventoryStocks())
+    dispatch(getInventoryStats())
   }
 
   const handleSaveUpdatedProduct = () => {
-    dispatch(updateProduct(editProductData));
-    dispatch(getInventoryStocks())
+    dispatch(updateProduct({
+      item: {
+        ...editProductData?.item,
+        'value': `$${editProductData?.item?.quantity * Number(editProductData?.item?.price?.split("$")?.[1] || editProductData?.item?.price)}`,
+        'price': `$${editProductData?.item?.price?.split("$")?.[1] || editProductData?.item?.price}`
+      },
+      index: editProductData?.index
+    }));
+    dispatch(getInventoryStats())
     setEditProductData({});
   }
 
@@ -67,7 +75,7 @@ function App() {
 
       {/* inventory stats */}
       <div className='m-auto'>
-        <h2 className='text-2xl text-primary m-4 mb-6'>Inventory Stats</h2>
+        <h2 className='text-2xl text-primary m-4 mb-6 pl-0 ml-0'>Inventory Stats</h2>
         <div className='grid grid-cols-4 gap-4'>
           <div className='bg-inventory-card-background p-4 items-center rounded-md flex gap-4 align-top'>
             <FaShoppingCart className='w-8 h-8' />
@@ -140,6 +148,9 @@ function App() {
             ))}
         </tbody>
       </table>
+
+      {/* loading state starts */}
+
       {isLoading &&
         <div className='text-2xl text-center 
        fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-fit h-fit
@@ -147,78 +158,17 @@ function App() {
           Loading ...</div>
       }
 
+      {/* loading state ends */}
+
+      {/* edit popup */}
       {editProductData?.item &&
-        <div className='relative w-full h-full bg-red'>
-          <div className='fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-5/12 h-1/2 rounded-xl p-6 bg-table-popup-background m-auto'>
-            <div className='flex justify-between w-full gap-4 align-top'>
-              <h2 className='text-2xl'>Edit Product</h2>
-              <div className='flex justify-center items-center shadow-md rounded-sm w-9 h-9 cursor-pointer border-gray-400/10 border-[1px]' onClick={() => setEditProductData(null)}>
-                <RxCross2 className='text-table-title text-xl' />
-              </div>
-            </div>
-            <p className='text-base '>{editProductData?.item?.name}</p>
-            <div className='grid grid-cols-2 gap-6 w-full mt-6'>
-              <div className="flex flex-col gap-2 justify-start">
-                <p className="text-xs">Category</p>
-                <input type='text'
-                  className='bg-[#46504f]  rounded-xl py-1 px-4'
-                  value={editProductData?.item?.category}
-                  onChange={(e: any) =>
-                    setEditProductData({
-                      item: { ...editProductData?.item, 'category': e.target.value },
-                      index: editProductData?.index
-                    })
-                  } />
-              </div>
-              <div className="flex flex-col gap-2 justify-start">
-                <p className="text-xs">Price</p>
-                <input type='text'
-                  className='bg-[#46504f]  rounded-xl py-1 px-4'
-                  value={editProductData?.item?.price}
-                  onChange={(e: any) =>
-                    setEditProductData({
-                      item: { ...editProductData?.item, 'price': e.target.value },
-                      index: editProductData?.index
-                    })
-                  } />
-              </div>
-              <div className="flex flex-col gap-2 justify-start">
-                <p className="text-xs">Quantity</p>
-                <input type='text'
-                  className='bg-[#46504f]  rounded-xl py-1 px-4'
-                  value={editProductData?.item?.quantity}
-                  onChange={(e: any) =>
-                    setEditProductData({
-                      item: { ...editProductData?.item, 'quantity': e.target.value },
-                      index: editProductData?.index
-                    })
-                  } />
-              </div>
-              <div className="flex flex-col gap-2 justify-start">
-                <p className="text-xs">Value</p>
-                <input type='text'
-                  className='bg-[#46504f]  rounded-xl py-1 px-4'
-                  value={editProductData?.item?.value}
-                  onChange={(e: any) =>
-                    setEditProductData({
-                      item: { ...editProductData?.item, 'value': e.target.value },
-                      index: editProductData?.index
-                    })
-                  } />
-              </div>
-            </div>
-            <div className='flex gap-4 justify-end mt-6'>
-              <button className='text-sm text-table-title cursor-pointer'
-                onClick={() => {
-                  setEditProductData({})
-                }}>Cancel</button>
-              <button className='py-1 px-3 rounded-lg bg-[#46504f] text-sm cursor-pointer text-[#7fa9a4]'
-                onClick={handleSaveUpdatedProduct}
-              >Save</button>
-            </div>
-          </div>
-        </div>
+        <EditPopup {...{
+          editProductData, setEditProductData, handleSaveUpdatedProduct
+        }}
+        />
+
       }
+
     </div>
   );
 }

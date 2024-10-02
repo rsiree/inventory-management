@@ -25,6 +25,10 @@
 .input-box{
   background-color: transparent;
 }
+input:focus{
+  outline-width: 0;
+  border:1px solid var(--border)
+}
 
 body {
   margin: 0;

@@ -21,11 +21,15 @@ const initialState: intialStateProps = {
 }
 
 const url: string = "https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory";
+
+// fetching data and storing the all the required data
+
 export const fetchData = createAsyncThunk(
     'fetchData',
     async () => {
         const response = await axios.get(url);
         const data = response.data;
+        // const data = [{ "name": "Bluetooth", "category": "Electronic", "value": "$150", "quantity": 5, "price": "$30" }, { "name": "Edifier M43560", "category": "Electronic", "value": "0", "quantity": 0, "price": "$0" }, { "name": "Sony 4k ultra 55 inch TV", "category": "Electronic", "value": "$1190", "quantity": 17, "price": "$70" }, { "name": "Samsumg 55 inch TV", "category": "Electronic", "value": "$600", "quantity": 50, "price": "$12" }, { "name": "samsumg S34 Ultra", "category": "phone", "value": "$0", "quantity": 0, "price": "$0" }]
 
         let out_of_stock = 0;
         const categories = {} as any;
@@ -72,7 +76,7 @@ export const dataSlice = createSlice({
 
 
         },
-        getInventoryStocks: (state: any) => {
+        getInventoryStats: (state: any) => {
             let data = [...state.data];
             let out_of_stock = 0;
             const categories = {} as any;
@@ -80,25 +84,28 @@ export const dataSlice = createSlice({
             let total_products = data?.length;
 
             for (let i = 0; i < data?.length; i++) {
-                console.log(data, data[i]?.quantity, data[i]?.isDisabled)
 
-                if (Number(data[i]?.quantity) === 0 || data[i]?.isDisabled) out_of_stock++;
+                // inventory stats is counted for the available products
+                if (!data[i]?.isDisabled) {
 
-                data[i]?.isDisabled && total_products--;
+                    Number(data[i]?.quantity) === 0 && out_of_stock++;
 
+                    for (let key in data[i]) {
+                        if (key === 'value') {
+                            let store_value = data[i]?.value?.split("$")?.[1] || data[i]?.value;
+                            total_store_value += Number(store_value);
+                        }
 
-                for (let key in data[i]) {
-                    if (key === 'value') {
-                        let store_value = data[i]?.value?.split("$")?.[1] || data[i]?.value;
-                        total_store_value += Number(store_value);
-                    }
-
-                    if (key === 'category') {
-                        let categoryName = data[i]?.category;
-                        if (categories[categoryName] === undefined) categories[categoryName] = 1;
-                        else categories[categoryName] += 1
+                        if (key === 'category') {
+                            let categoryName = data[i]?.category;
+                            if (categories[categoryName] === undefined) categories[categoryName] = 1;
+                            else categories[categoryName] += 1
+                        }
                     }
                 }
+
+                //total products only if product is not disabled
+                data[i]?.isDisabled && total_products--;
             }
             state.outOfStock = out_of_stock;
             state.totalStoreValue = total_store_value;
@@ -127,10 +134,10 @@ export const dataSlice = createSlice({
 })
 
 export const {
-    deleteProduct,
-    disableProduct,
-    updateProduct,
-    getInventoryStocks
+    deleteProduct, //to delete a product
+    disableProduct, // to disable a product
+    updateProduct, // to update a product
+    getInventoryStats // to get the inventory stats when ever any update is formed on the product
 } = dataSlice.actions
 
 export default dataSlice.reducer
