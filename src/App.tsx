@@ -76,7 +76,7 @@ function App() {
       <div className='m-auto'>
         <h2 className='text-2xl text-primary m-4 mb-6 pl-0 ml-0'>Inventory Stats</h2>
         <div className='grid grid-cols-4 gap-4'>
-          <div className='bg-inventory-card-background p-4 items-center rounded-md flex gap-4 align-top'>
+          <div className='bg-inventory-card-background p-3 rounded-md flex gap-4 align-top min-h-24'>
             <FaShoppingCart className='w-8 h-8' />
             <div className='flex flex-col items-start'>
               <p className='text-sm'>Total Product</p>
