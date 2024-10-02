@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { isDisabled } from "@testing-library/user-event/dist/utils";
 import axios from "axios";
 
 interface intialStateProps {

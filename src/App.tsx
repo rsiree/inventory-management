@@ -5,7 +5,6 @@ import { FaShoppingCart } from "react-icons/fa";
 import { RiExchangeDollarLine } from "react-icons/ri";
 import { MdRemoveShoppingCart, MdCategory, MdDelete, MdEdit } from "react-icons/md";
 import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
-import { RxCross2 } from "react-icons/rx";
 
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteProduct, disableProduct, fetchData, getInventoryStats, updateProduct } from './redux/slices/data';
