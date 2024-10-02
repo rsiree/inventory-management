@@ -59,81 +59,53 @@ export const dataSlice = createSlice({
     initialState,
     reducers: {
         deleteProduct: (state: any, action: PayloadAction<any>) => {
-            let { category, quantity, value, isDisabled } = action?.payload?.item;
             let data = [...state.data];
             state.data = data?.filter((_: any, index: number) => index !== action?.payload?.index);
-            state.outOfStock = quantity === 0 ? isDisabled ? state.outOfStock : state.outOfStock - 1 : state.outOfStock;
-
-            for (let key in state.categoryData) {
-                let value = state.categoryData[category]
-                if (key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) {
-                    value > 1 ? state.categoryData[category]-- : state.categoryData[category] = 0;
-                }
-            };
-            state.totalProducts = isDisabled ? state.totalProducts : state.totalProducts - 1;
-            state.totalStoreValue = isDisabled ? state.totalStoreValue : state.totalStoreValue - Number(value?.split("$")?.[1] || value);
         },
         disableProduct: (state: any, action: PayloadAction<any>) => {
-            let { index, isDisabled, item } = action?.payload;
-            let { category, quantity, value } = item;
+            let { index, isDisabled } = action?.payload;
             let data = [...state.data];
             state.data = data?.map((item: any, ind: number) => ind === index ? { ...item, 'isDisabled': isDisabled } : item);
-            // state.outOfStock = quantity === 0 ? state.outOfStock - 1 : state.outOfStock;
-            let storeValue = value?.split("$")?.[1] || value;
-            state.totalStoreValue = isDisabled ? state.totalStoreValue - Number(storeValue) : state.totalStoreValue + Number(storeValue);
-            for (let key in state.categoryData) {
-                let value = state.categoryData[category]
-                if (key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) {
-                    isDisabled ?
-                        value > 1 ?
-                            state.categoryData[category]--
-                            : state.categoryData[category] = 0
-                        :
-                        value > 0 ?
-                            state.categoryData[category]++
-                            : state.categoryData[category] = 1;
-                }
-            }
-            state.outOfStock = quantity === 0 ? isDisabled ? state.outOfStock - 1 : state.outOfStock + 1 : state.outOfStock;
-            state.totalProducts = isDisabled ? state.totalProducts - 1 : state.totalProducts + 1
         },
         updateProduct: (state: any, action: PayloadAction<any>) => {
             const { item, index } = action?.payload;
-            const { category, value, quantity } = item;
             let data = [...state.data];
-            let existingData = state.data?.find((_: any, ind: number) => ind === index);
-            let existingCategory = existingData?.category
             state.data = data?.map((product: any, ind: number) => ind === index ? item : product);
 
-            let flag = false;
-            for (let key in state.categoryData) {
-                if ((key?.toLocaleLowerCase() === category?.toLocaleLowerCase()) && (existingCategory?.toLowerCase() === category?.toLowerCase())) {
-                    flag = true;
-                    break;
+
+        },
+        getInventoryStocks: (state: any) => {
+            let data = [...state.data];
+            let out_of_stock = 0;
+            const categories = {} as any;
+            let total_store_value = 0;
+            let total_products = data?.length;
+
+            for (let i = 0; i < data?.length; i++) {
+                console.log(data, data[i]?.quantity, data[i]?.isDisabled)
+
+                if (Number(data[i]?.quantity) === 0 || data[i]?.isDisabled) out_of_stock++;
+
+                data[i]?.isDisabled && total_products--;
+
+
+                for (let key in data[i]) {
+                    if (key === 'value') {
+                        let store_value = data[i]?.value?.split("$")?.[1] || data[i]?.value;
+                        total_store_value += Number(store_value);
+                    }
+
+                    if (key === 'category') {
+                        let categoryName = data[i]?.category;
+                        if (categories[categoryName] === undefined) categories[categoryName] = 1;
+                        else categories[categoryName] += 1
+                    }
                 }
             }
-
-            if (flag) {
-                state.categoryData = { ...state.categoryData, [category]: state.categoryData[category] === 0 ? 1 : state.categoryData[category] }
-            }
-            else {
-                state.categoryData = {
-                    ...state.categoryData,
-                    [existingCategory]: state.categoryData[existingCategory] === 0 ? 0 : state.categoryData[existingCategory] - 1,
-                    [category]: 1
-                }
-            }
-
-            state.outOfStock = existingData?.quantity > 0 ?
-                quantity > 0 ?
-                    state.outOfStock
-                    : state.outOfStock + 1
-                : quantity > 0 ?
-                    state.outOfStock - 1
-                    : state.outOfStock
-                ;
-
-            state.totalStoreValue = state.totalStoreValue - Number(existingData?.value?.split("$")?.[1] || existingData?.value) + Number(value?.split("$")?.[1] || value)
+            state.outOfStock = out_of_stock;
+            state.totalStoreValue = total_store_value;
+            state.categoryData = categories;
+            state.totalProducts = total_products
         }
     },
     extraReducers: (builder) => {
@@ -148,7 +120,7 @@ export const dataSlice = createSlice({
                 state.categoryData = categories;
                 state.outOfStock = out_of_stock;
                 state.totalStoreValue = total_store_value;
-                state.totalProducts = data?.length
+                state.totalProducts = data?.length;
             })
             .addCase(fetchData.rejected, (state: any, action: any) => {
                 state.isLoading = false
@@ -159,7 +131,8 @@ export const dataSlice = createSlice({
 export const {
     deleteProduct,
     disableProduct,
-    updateProduct
+    updateProduct,
+    getInventoryStocks
 } = dataSlice.actions
 
 export default dataSlice.reducer

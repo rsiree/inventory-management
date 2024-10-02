@@ -8,7 +8,7 @@ import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProduct, disableProduct, fetchData, updateProduct } from './redux/slices/data';
+import { deleteProduct, disableProduct, fetchData, getInventoryStocks, updateProduct } from './redux/slices/data';
 
 function App() {
 
@@ -19,7 +19,8 @@ function App() {
 
 
   const handleDeleteProduct = ({ index, item }: any) => {
-    dispatch(deleteProduct({ item, index }))
+    dispatch(deleteProduct({ item, index }));
+    dispatch(getInventoryStocks())
   }
 
   const handleEditProduct = ({ item, index }: any) => {
@@ -27,12 +28,14 @@ function App() {
   }
 
   const handleDisableProduct = ({ index, isDisabled, item }: any) => {
-    dispatch(disableProduct({ index, isDisabled, item }))
+    dispatch(disableProduct({ index, isDisabled, item }));
+    dispatch(getInventoryStocks())
   }
 
   const handleSaveUpdatedProduct = () => {
     dispatch(updateProduct(editProductData));
-    setEditProductData({})
+    dispatch(getInventoryStocks())
+    setEditProductData({});
   }
 
   // console.log(data, categoryData, outOfStock, totalStoreValue)
@@ -41,7 +44,6 @@ function App() {
   }, []);
 
   // console.log(editProductData)
-  if (isLoading) return <div className='text-2xl m-auto text-center'>Loading ...</div>
 
   return (
     <div className={"max-w-7xl py-3 px-4 m-auto relative"}>
@@ -112,7 +114,7 @@ function App() {
         </thead>
         <tbody className='w-full pb-2'>
           {data?.length === 0 ?
-            <div className='w-full text-center text-xl p-4'>No Product Found</div>
+            <tr className='w-full text-center text-xl p-4'>No Products</tr>
             : data?.map((item: any, index: number) => (
               <tr className='mt-2' key={index}>
                 <td className='text-base px-4 py-4 border-border border-t-[1px]'>{item?.name}</td>
@@ -123,7 +125,7 @@ function App() {
                 <td className="text-base px-4 py-5 border-border border-t-[1px]
                flex gap-1">
                   {isAdmin ?
-                    <MdEdit className={item?.isDisabled ? 'text-border cursor-not-allowed' : 'text-green-800 cursor-pointer'} onClick={() => handleEditProduct({ item, index })} />
+                    <MdEdit className={item?.isDisabled ? 'text-border cursor-not-allowed' : 'text-green-800 cursor-pointer'} onClick={() => !item?.isDisabled && handleEditProduct({ item, index })} />
                     :
                     <MdEdit className='text-border cursor-not-allowed' />
                   }
@@ -138,6 +140,13 @@ function App() {
             ))}
         </tbody>
       </table>
+      {isLoading &&
+        <div className='text-2xl text-center 
+       fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-fit h-fit
+       rounded-xl p-6 px-8 bg-[#2f3735db] m-auto '>
+          Loading ...</div>
+      }
+
       {editProductData?.item &&
         <div className='relative w-full h-full bg-red'>
           <div className='fixed z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-5/12 h-1/2 rounded-xl p-6 bg-table-popup-background m-auto'>
